@@ -39,7 +39,7 @@ def get_statement_xml_tag(tag: Tree.Element) -> Tree.Element:
     return tag.find("%sstatement" % xml_namespace)[0]
 
 
-def parse_statement(block: Tree.Element, tag: html_tag, add_element: html_tag = None) -> None:
+def parse_statement(block: Tree.Element, tag: html_tag, add_element: str = None) -> None:
     """
     Parses every block inside of the 'statement' block.
     :param block:
@@ -51,21 +51,14 @@ def parse_statement(block: Tree.Element, tag: html_tag, add_element: html_tag = 
         next_tag = get_statement_xml_tag(block)
         while next_tag is not None:  # Ugly trick
             if add_element is not None:
-                add_element += make_html_tag(next_tag)
-                tag += add_element
-                breakpoint()
+                element = add_element()
+                element += make_html_tag(next_tag)
+                tag += element
             else:
                 tag += make_html_tag(next_tag)
             next_tag = get_next_xml_tag(next_tag)
     except Exception:
         pass
-
-# while next_tag is not None:
-#     if add_element is not None:
-#         add_element += make_html_tag(next_tag)
-#         tag += add_element
-#     else:
-#         tag += make_html_tag(next_tag)
 
 
 def make_html_tag(block) -> html_tag:
@@ -93,7 +86,7 @@ def make_html_tag(block) -> html_tag:
                 tag = ol()
             else:
                 tag = ul()
-            parse_statement(block, tag, li())
+            parse_statement(block, tag, li)
         if case("text_area"):
             tag = textarea()
             tag['name'] = block[0].text
